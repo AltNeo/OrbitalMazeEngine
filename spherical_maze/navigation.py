@@ -19,12 +19,72 @@ class DotEntity:
     target_node: UUID | None = None
     path_queue: list[UUID] = field(default_factory=list)
     current_path_index: int = 0
+
+    # V2: First-person view properties
+    yaw: float = 0.0  # Horizontal rotation (left/right)
+    pitch: float = 0.0  # Vertical rotation (up/down)
+    height: float = 5.0  # Height above sphere surface
     last_reached_node: UUID | None = field(default=None, init=False, repr=False)
 
     @classmethod
     def from_position(cls, latitude: float, longitude: float, speed: float = 1.0) -> "DotEntity":
         """Create a dot entity at a specific position."""
         return cls(latitude=latitude, longitude=longitude, speed=speed)
+
+    def move_by(self, forward: float, strafe: float, delta_time: float) -> None:
+        """Move the dot manually based on yaw direction (V2 first-person control).
+
+        Args:
+            forward: Forward/backward movement (-1 to 1)
+            strafe: Left/right strafing (-1 to 1)
+            delta_time: Time since last frame
+        """
+        if forward == 0.0 and strafe == 0.0:
+            return
+
+        # Calculate movement speed
+        move_distance = self.speed * delta_time
+
+        # Convert yaw to radians for calculation
+        yaw_rad = math.radians(self.yaw)
+
+        # Calculate movement vectors based on yaw
+        # Forward direction aligned with yaw
+        forward_lat = forward * move_distance * math.cos(yaw_rad)
+        forward_lon = forward * move_distance * math.sin(yaw_rad)
+
+        # Strafe direction perpendicular to yaw
+        strafe_lat = strafe * move_distance * math.sin(yaw_rad)
+        strafe_lon = -strafe * move_distance * math.cos(yaw_rad)
+
+        # Apply movement
+        self.latitude += forward_lat + strafe_lat
+        self.longitude += forward_lon + strafe_lon
+
+        # Clamp latitude to valid range
+        self.latitude = max(-90.0, min(90.0, self.latitude))
+
+        # Wrap longitude
+        if self.longitude > 180.0:
+            self.longitude -= 360.0
+        elif self.longitude < -180.0:
+            self.longitude += 360.0
+
+    def rotate_view(self, delta_yaw: float, delta_pitch: float) -> None:
+        """Rotate the player's view (V2 mouse look).
+
+        Args:
+            delta_yaw: Change in horizontal rotation
+            delta_pitch: Change in vertical rotation
+        """
+        self.yaw += delta_yaw
+        self.pitch += delta_pitch
+
+        # Wrap yaw to 0-360 range
+        self.yaw = self.yaw % 360.0
+
+        # Clamp pitch to prevent over-rotation
+        self.pitch = max(-89.0, min(89.0, self.pitch))
 
     def set_path(self, path: list[UUID]) -> None:
         """Set the path for the dot to follow."""

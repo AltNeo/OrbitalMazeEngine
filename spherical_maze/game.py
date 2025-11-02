@@ -119,11 +119,7 @@ class SphericalMazeGame:
                 node.longitude,
             )
 
-        candidates = [
-            node
-            for node in self.graph.nodes.values()
-            if node.id != self.origin_node_id
-        ]
+        candidates = [node for node in self.graph.nodes.values() if node.id != self.origin_node_id]
 
         if not candidates:
             return None
@@ -203,9 +199,7 @@ class SphericalMazeGame:
                 )
 
         if not self._schedule_next_route():
-            self.status_text = (
-                f"Reached hub at ({self.dot.latitude:.1f}, {self.dot.longitude:.1f})"
-            )
+            self.status_text = f"Reached hub at ({self.dot.latitude:.1f}, {self.dot.longitude:.1f})"
 
     def handle_events(self) -> None:
         """Handle user input events."""
@@ -284,9 +278,7 @@ class SphericalMazeGame:
 
             if self.path_follower.is_complete() and not was_complete:
                 if self.dot:
-                    self.status_text = (
-                        f"Reached destination at ({self.dot.latitude:.1f}, {self.dot.longitude:.1f})"
-                    )
+                    self.status_text = f"Reached destination at ({self.dot.latitude:.1f}, {self.dot.longitude:.1f})"
                 self._handle_path_completion()
 
     def render(self) -> None:

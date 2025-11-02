@@ -48,7 +48,9 @@ class AIMapGenerator:
         # Preserve explicit arguments, otherwise fall back to environment values.
         self.api_key = api_key if api_key is not None else (env_api_key or "dummy-key")
         self.api_endpoint = (
-            api_endpoint if api_endpoint is not None else (env_endpoint or "https://api.openai.com/v1")
+            api_endpoint
+            if api_endpoint is not None
+            else (env_endpoint or "https://api.openai.com/v1")
         )
         self.model = model if model is not None else (env_model or "gpt-4o-mini")
         self.use_dummy = use_dummy
@@ -336,7 +338,11 @@ class AIMapGenerator:
             cost = edge_data.get("cost", 1.0)
             raw_path = edge_data.get("path_points")
 
-            if from_idx in node_map and to_idx in node_map and node_map[from_idx] != node_map[to_idx]:
+            if (
+                from_idx in node_map
+                and to_idx in node_map
+                and node_map[from_idx] != node_map[to_idx]
+            ):
                 path_points = None
                 if raw_path:
                     path_points = [(float(lat), float(lon)) for lat, lon in raw_path]

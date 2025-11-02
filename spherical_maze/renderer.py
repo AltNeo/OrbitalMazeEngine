@@ -261,7 +261,7 @@ class SphereRenderer:
                 max(1, int(self.zoom)),
             )
 
-        visible_nodes: list[tuple["MazeNode", tuple[tuple[int, int], float]]] = []
+        visible_nodes: list[tuple[MazeNode, tuple[tuple[int, int], float]]] = []
         for node in graph.nodes.values():
             projected = self.project_with_depth(node.latitude, node.longitude)
             if projected is None:
