@@ -2,8 +2,6 @@
 
 import math
 
-import pytest
-
 from spherical_maze.navigation import DotEntity
 
 
@@ -124,6 +122,67 @@ class TestV2DotEntity:
             dot.move_by(forward=1.0, strafe=0.0, delta_time=0.1)
 
         assert -180.0 <= dot.longitude <= 180.0
+
+    def test_collision_detection_with_graph(self) -> None:
+        """Test collision detection prevents walking through walls."""
+        from spherical_maze.maze_graph import MazeGraph
+
+        graph = MazeGraph()
+        node1 = graph.add_node(0.0, 0.0)
+        node2 = graph.add_node(5.0, 0.0)
+        graph.add_edge(node1.id, node2.id)
+
+        # Dot on the path
+        dot = DotEntity(latitude=2.5, longitude=0.0, speed=10.0, yaw=90.0)
+
+        # Try to move perpendicular to path (off path)
+        initial_pos = (dot.latitude, dot.longitude)
+        dot.move_by(forward=0.0, strafe=1.0, delta_time=0.5, graph=graph)
+
+        # Should be blocked by collision detection (or close to initial)
+        dist_moved = math.sqrt(
+            (dot.latitude - initial_pos[0]) ** 2 + (dot.longitude - initial_pos[1]) ** 2
+        )
+        # Movement should be limited by collision
+        assert dist_moved < 5.0  # Would be larger without collision
+
+    def test_distance_to_segment(self) -> None:
+        """Test distance calculation to line segment."""
+        # Point on the segment
+        dist = DotEntity._distance_to_segment(2.0, 0.0, 0.0, 0.0, 4.0, 0.0)
+        assert abs(dist) < 0.1
+
+        # Point off the segment
+        dist = DotEntity._distance_to_segment(2.0, 5.0, 0.0, 0.0, 4.0, 0.0)
+        assert abs(dist - 5.0) < 0.1
+
+        # Point before segment start
+        dist = DotEntity._distance_to_segment(-1.0, 0.0, 0.0, 0.0, 4.0, 0.0)
+        assert abs(dist - 1.0) < 0.1
+
+        # Point after segment end
+        dist = DotEntity._distance_to_segment(5.0, 0.0, 0.0, 0.0, 4.0, 0.0)
+        assert abs(dist - 1.0) < 0.1
+
+    def test_valid_position_check(self) -> None:
+        """Test position validity checking."""
+        from spherical_maze.maze_graph import MazeGraph
+
+        graph = MazeGraph()
+        node1 = graph.add_node(0.0, 0.0)
+        node2 = graph.add_node(10.0, 0.0)
+        graph.add_edge(node1.id, node2.id)
+
+        dot = DotEntity(latitude=0.0, longitude=0.0)
+
+        # Position on path should be valid
+        assert dot._check_valid_position(5.0, 0.0, graph)
+
+        # Position near path should be valid
+        assert dot._check_valid_position(5.0, 1.0, graph)
+
+        # Position far from path should be invalid
+        assert not dot._check_valid_position(50.0, 50.0, graph)
 
 
 class TestV2Integration:

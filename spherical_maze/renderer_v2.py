@@ -23,6 +23,7 @@ class FirstPersonRenderer:
         self.fov = 90.0  # Field of view in degrees
         self.wall_height = 8.0  # Height of maze walls
         self.path_width = 3.0  # Width of paths (for wall generation)
+        self.render_distance = 100.0  # Maximum render distance
 
         pygame.init()
         self.screen = pygame.display.set_mode(screen_size)
@@ -30,8 +31,9 @@ class FirstPersonRenderer:
 
         # Colors
         self.bg_color = (10, 10, 30)
-        self.floor_color = (40, 40, 60)
-        self.wall_color = (100, 120, 140)
+        self.floor_color = (60, 80, 100)
+        self.wall_color = (120, 140, 160)
+        self.wall_dark_color = (80, 90, 100)
         self.ceiling_color = (20, 20, 40)
 
     def spherical_to_cartesian(
@@ -285,10 +287,20 @@ class FirstPersonRenderer:
         # Calculate view matrix
         view_matrix = self.get_view_matrix(player)
 
-        # Draw ceiling (simple gradient)
-        pygame.draw.rect(
-            self.screen, self.ceiling_color, (0, 0, self.screen_width, self.screen_height // 2)
-        )
+        # Draw ceiling
+        mid_y = self.screen_height // 2
+        pygame.draw.rect(self.screen, self.ceiling_color, (0, 0, self.screen_width, mid_y))
+
+        # Draw floor with gradient for depth perception
+        floor_dark = (30, 40, 50)
+        for y in range(mid_y, self.screen_height):
+            factor = (y - mid_y) / (self.screen_height - mid_y)
+            color = (
+                int(self.floor_color[0] * (1 - factor) + floor_dark[0] * factor),
+                int(self.floor_color[1] * (1 - factor) + floor_dark[1] * factor),
+                int(self.floor_color[2] * (1 - factor) + floor_dark[2] * factor),
+            )
+            pygame.draw.line(self.screen, color, (0, y), (self.screen_width, y))
 
         # Render all edges as 3D wall segments
         for edge in graph.edges.values():

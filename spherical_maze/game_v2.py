@@ -170,9 +170,9 @@ class FirstPersonMazeGame:
         if keys[pygame.K_d]:
             strafe += 1.0
 
-        # Apply movement
+        # Apply movement with collision detection
         if forward != 0.0 or strafe != 0.0:
-            self.dot.move_by(forward, strafe, delta_time)
+            self.dot.move_by(forward, strafe, delta_time, self.graph)
 
     def render(self) -> None:
         """Render the game."""

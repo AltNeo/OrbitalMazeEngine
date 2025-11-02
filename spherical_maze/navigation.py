@@ -31,13 +31,16 @@ class DotEntity:
         """Create a dot entity at a specific position."""
         return cls(latitude=latitude, longitude=longitude, speed=speed)
 
-    def move_by(self, forward: float, strafe: float, delta_time: float) -> None:
+    def move_by(
+        self, forward: float, strafe: float, delta_time: float, graph: "MazeGraph | None" = None
+    ) -> None:
         """Move the dot manually based on yaw direction (V2 first-person control).
 
         Args:
             forward: Forward/backward movement (-1 to 1)
             strafe: Left/right strafing (-1 to 1)
             delta_time: Time since last frame
+            graph: Optional MazeGraph for collision detection
         """
         if forward == 0.0 and strafe == 0.0:
             return
@@ -57,18 +60,94 @@ class DotEntity:
         strafe_lat = strafe * move_distance * math.sin(yaw_rad)
         strafe_lon = -strafe * move_distance * math.cos(yaw_rad)
 
-        # Apply movement
-        self.latitude += forward_lat + strafe_lat
-        self.longitude += forward_lon + strafe_lon
+        # Calculate new position
+        new_lat = self.latitude + forward_lat + strafe_lat
+        new_lon = self.longitude + forward_lon + strafe_lon
 
         # Clamp latitude to valid range
-        self.latitude = max(-90.0, min(90.0, self.latitude))
+        new_lat = max(-90.0, min(90.0, new_lat))
 
         # Wrap longitude
-        if self.longitude > 180.0:
-            self.longitude -= 360.0
-        elif self.longitude < -180.0:
-            self.longitude += 360.0
+        if new_lon > 180.0:
+            new_lon -= 360.0
+        elif new_lon < -180.0:
+            new_lon += 360.0
+
+        # Check collision if graph provided
+        if graph is not None:
+            if self._check_valid_position(new_lat, new_lon, graph):
+                self.latitude = new_lat
+                self.longitude = new_lon
+        else:
+            # No collision detection, allow movement
+            self.latitude = new_lat
+            self.longitude = new_lon
+
+    def _check_valid_position(self, lat: float, lon: float, graph: "MazeGraph") -> bool:
+        """Check if position is on a valid path (not through walls).
+
+        Args:
+            lat: Target latitude
+            lon: Target longitude
+            graph: Maze graph to check against
+
+        Returns:
+            True if position is valid, False if blocked by wall
+        """
+        # Find nearest path edge
+        min_distance = float("inf")
+        is_on_path = False
+        path_tolerance = 2.0  # Distance tolerance for being "on path"
+
+        for edge in graph.edges.values():
+            if edge.blocked:
+                continue
+
+            node_a = graph.nodes.get(edge.node_a)
+            node_b = graph.nodes.get(edge.node_b)
+
+            if node_a is None or node_b is None:
+                continue
+
+            # Calculate distance from point to line segment
+            dist = self._distance_to_segment(
+                lat, lon, node_a.latitude, node_a.longitude, node_b.latitude, node_b.longitude
+            )
+
+            if dist < min_distance:
+                min_distance = dist
+
+            if dist <= path_tolerance:
+                is_on_path = True
+                break
+
+        return is_on_path or min_distance <= path_tolerance
+
+    @staticmethod
+    def _distance_to_segment(
+        px: float, py: float, x1: float, y1: float, x2: float, y2: float
+    ) -> float:
+        """Calculate minimum distance from point (px, py) to line segment (x1,y1)-(x2,y2)."""
+        # Vector from point 1 to point 2
+        dx = x2 - x1
+        dy = y2 - y1
+
+        if dx == 0 and dy == 0:
+            # Segment is a point
+            return math.sqrt((px - x1) ** 2 + (py - y1) ** 2)
+
+        # Parameter t for closest point on line
+        t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)
+
+        # Clamp to segment
+        t = max(0.0, min(1.0, t))
+
+        # Closest point on segment
+        closest_x = x1 + t * dx
+        closest_y = y1 + t * dy
+
+        # Distance from point to closest point
+        return math.sqrt((px - closest_x) ** 2 + (py - closest_y) ** 2)
 
     def rotate_view(self, delta_yaw: float, delta_pitch: float) -> None:
         """Rotate the player's view (V2 mouse look).
