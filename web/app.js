@@ -15,6 +15,7 @@ const elements = {
   loopsStat: document.getElementById("loopsStat"),
   headingStat: document.getElementById("headingStat"),
   branchStat: document.getElementById("branchStat"),
+  nodesLeftStat: document.getElementById("nodesLeftStat"),
   targetStat: document.getElementById("targetStat"),
   radarPanel: document.getElementById("radarPanel"),
   regenerateButton: document.getElementById("regenerateButton"),

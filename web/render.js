@@ -150,11 +150,14 @@ export function updateHud(elements, state, maze) {
   elements.loopsStat.textContent = `${cycleCount(maze)} cycles`;
   elements.headingStat.textContent = getHeadingLabel(maze, state.fromNode, state.toNode);
   const distance = estimateTargetDistance(maze, state);
+  const nodesLeft = state.reachedTarget ? 0 : distance === null ? null : distance + 1;
   elements.branchStat.textContent = state.reachedTarget
     ? "Beacon secured"
     : distance === null
       ? getBranchLabel(state)
       : `${getBranchLabel(state)} / ${distance} hops to target`;
+  elements.nodesLeftStat.textContent =
+    nodesLeft === null ? "Unknown" : `${nodesLeft} node${nodesLeft === 1 ? "" : "s"}`;
   elements.targetStat.textContent = state.reachedTarget
     ? "Target reached"
     : `Beacon node ${state.targetNode.toUpperCase()}`;
