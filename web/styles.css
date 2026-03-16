@@ -1,0 +1,340 @@
+:root {
+  --bg: #0a1017;
+  --bg-soft: #142232;
+  --panel: rgba(13, 21, 31, 0.8);
+  --panel-strong: rgba(7, 13, 20, 0.92);
+  --line: rgba(255, 225, 182, 0.18);
+  --line-strong: rgba(255, 204, 122, 0.38);
+  --text: #f8f2e9;
+  --muted: #b5bec8;
+  --accent: #f59b48;
+  --accent-deep: #cc5d15;
+  --teal: #74d5cf;
+  --danger: #f26a55;
+  --shadow: 0 22px 50px rgba(0, 0, 0, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(245, 155, 72, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 18%, rgba(116, 213, 207, 0.11), transparent 24%),
+    linear-gradient(160deg, #05080c 0%, #0b121a 44%, #0e1620 100%);
+  color: var(--text);
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.08;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+  background-size: 3px 3px, 4px 4px;
+  mix-blend-mode: soft-light;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(1500px, calc(100vw - 32px));
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 18px;
+}
+
+.intro,
+.viewport-panel,
+.radar-panel {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(16, 24, 36, 0.9), rgba(8, 13, 20, 0.92));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+.intro {
+  grid-column: 1 / -1;
+  padding: 34px 34px 28px;
+  background:
+    linear-gradient(120deg, rgba(245, 155, 72, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(18, 28, 42, 0.96), rgba(8, 12, 18, 0.94));
+}
+
+.eyebrow,
+.panel-tag,
+.stat-label,
+.hud-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 10px 0 12px;
+  max-width: 11ch;
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(3.3rem, 7vw, 6.5rem);
+  line-height: 0.92;
+  font-weight: 400;
+}
+
+.lede,
+.panel-copy {
+  max-width: 74ch;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.control-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 24px;
+}
+
+button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+}
+
+button.accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  color: #180d05;
+  border-color: rgba(255, 214, 169, 0.22);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.stat-grid article,
+.legend,
+.hud {
+  backdrop-filter: blur(16px);
+}
+
+.stat-grid article {
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-grid strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.05rem;
+}
+
+.viewport-panel,
+.radar-panel {
+  padding: 20px;
+}
+
+.viewport-panel {
+  position: relative;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.panel-copy {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+#viewport,
+#radar {
+  width: 100%;
+  display: block;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 224, 190, 0.12);
+  background: linear-gradient(180deg, #091018, #05080c);
+}
+
+#viewport {
+  aspect-ratio: 16 / 9;
+  min-height: 420px;
+}
+
+#radar {
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at center, rgba(116, 213, 207, 0.08), transparent 42%),
+    linear-gradient(180deg, #091018, #05080c);
+}
+
+.hud,
+.legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.9rem;
+}
+
+.viewport-overlay {
+  position: absolute;
+  inset: 108px 42px 78px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 226, 192, 0.18);
+  background: linear-gradient(180deg, rgba(5, 10, 15, 0.6), rgba(7, 11, 17, 0.82));
+  backdrop-filter: blur(10px);
+}
+
+.viewport-overlay[hidden] {
+  display: none;
+}
+
+.viewport-overlay h2 {
+  margin: 0 0 10px;
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+  font-weight: 400;
+}
+
+.viewport-overlay p {
+  margin: 0;
+  max-width: 28ch;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.hud-value {
+  display: block;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.legend {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.swatch.current {
+  background: var(--accent);
+}
+
+.swatch.visible {
+  background: var(--teal);
+}
+
+.swatch.hidden {
+  background: rgba(245, 242, 233, 0.18);
+}
+
+.radar-panel.is-hidden {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 680px) {
+  .shell {
+    width: min(100vw - 16px, 1500px);
+    margin: 8px auto 24px;
+    gap: 12px;
+  }
+
+  .intro,
+  .viewport-panel,
+  .radar-panel {
+    border-radius: 22px;
+  }
+
+  .intro {
+    padding: 24px 20px;
+  }
+
+  .viewport-panel,
+  .radar-panel {
+    padding: 14px;
+  }
+
+  .viewport-overlay {
+    inset: 92px 18px 82px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hud {
+    flex-wrap: wrap;
+  }
+}

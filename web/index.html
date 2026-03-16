@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spherical Maze Atlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://threejs.org/build/three.module.js",
+          "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <main class="shell">
+      <section class="intro">
+        <p class="eyebrow">Web Prototype / Hollow Sphere / Cyclic Graph</p>
+        <h1>Atlas of the Inner Maze</h1>
+        <p class="lede">
+          A browser-first interpretation of the sphere maze: a looping node graph wrapped around
+          an orbital shell, rendered as a first-person corridor with local line-of-sight and a
+          celestial radar instead of a flat level editor.
+        </p>
+
+        <div class="control-strip">
+          <button id="regenerateButton" class="accent">Generate New Sphere</button>
+          <button id="recenterButton">Recenter View</button>
+          <button id="radarButton">Hide Radar</button>
+        </div>
+
+        <div class="stat-grid">
+          <article>
+            <span class="stat-label">Topology</span>
+            <strong id="nodesStat">12 nodes</strong>
+          </article>
+          <article>
+            <span class="stat-label">Loops</span>
+            <strong id="loopsStat">3 cycles</strong>
+          </article>
+          <article>
+            <span class="stat-label">Heading</span>
+            <strong id="headingStat">Orbital East</strong>
+          </article>
+          <article>
+            <span class="stat-label">Next Branch</span>
+            <strong id="branchStat">Forward arc</strong>
+          </article>
+          <article>
+            <span class="stat-label">Objective</span>
+            <strong id="targetStat">Beacon node N15</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="viewport-panel">
+        <div class="panel-header">
+          <p class="panel-tag">First Person</p>
+          <p class="panel-copy">
+            Real inner-sphere corridor geometry, real occlusion, and a target beacon waiting on the
+            far side of the shell.
+          </p>
+        </div>
+        <canvas id="viewport" width="1280" height="720"></canvas>
+        <div class="viewport-overlay" id="viewportOverlay" hidden>
+          <h2>Signal Acquired</h2>
+          <p>You reached the beacon. Generate a new sphere to start another route.</p>
+        </div>
+        <div class="hud">
+          <div>
+            <span class="hud-label">Walk</span>
+            <span class="hud-value">W / S</span>
+          </div>
+          <div>
+            <span class="hud-label">Lean + Choose</span>
+            <span class="hud-value">A / D</span>
+          </div>
+          <div>
+            <span class="hud-label">Radar</span>
+            <span class="hud-value">M</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="radar-panel" id="radarPanel">
+        <div class="panel-header">
+          <p class="panel-tag">Sphere Radar</p>
+          <p class="panel-copy">
+            The graph is still spherical under the hood. This view shows the local hemisphere and
+            the active path without turning the experience into a full minimap.
+          </p>
+        </div>
+        <canvas id="radar" width="520" height="520"></canvas>
+        <div class="legend">
+          <span><i class="swatch current"></i> current corridor</span>
+          <span><i class="swatch visible"></i> visible graph</span>
+          <span><i class="swatch hidden"></i> far hemisphere</span>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
